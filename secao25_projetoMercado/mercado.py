@@ -3,6 +3,7 @@ from time import sleep
 
 from psycopg2._psycopg import List
 from secao25_projetoMercado.models.produto import Produto
+from secao25_projetoMercado.utils.helper import formata_float_str_moeda
 
 produtos: List[Produto] = []
 carrinho: List[Dict[Produto, int]] = []
@@ -70,7 +71,7 @@ def listar_produtos() -> None:
     sleep(2)
     menu()
 
-def comprar_produto() -> None:
+def comprar_produto(codigo=None) -> None:
     if len(produtos) > 0:
         print('Informe o código do produto que deseja adicionar ao carrinho: ')
         print('-------------------------------------')
@@ -79,6 +80,8 @@ def comprar_produto() -> None:
             print(produto)
             print('----------------------------------')
             sleep(1)
+        codigo: int = int(input())
+
         produto: Produto = pega_produto_por_codigo(codigo)
 
         if produto:
@@ -129,10 +132,38 @@ def visualizar_carrinho():
     sleep(2)
     menu()
 
-def fechar_pedido():
-    pass
+def fechar_pedido() -> None:
+    if len(carrinho) > 0:
+        valor_total: float =0
+
+        print('Produtos do Carrinho')
+        for item in carrinho:
+            for dados in item.items():
+                print(dados[0])
+                print(f'Quantidade:{dados[1]}')
+                valor_total += dados[0].preco * dados[1]
+                print('-------------------------')
+                sleep(1)
+        print(f'Sua fatura é {formata_float_str_moeda(valor_total)}')
+        print('Volte sempre!')
+        carrinho.clear()
+        sleep(5)
+    else:
+        print('Ainda não existem produtos no carrinho.')
+        sleep(2)
+        menu()
 
 
+def pega_produto_por_codigo(codigo: int) -> Produto:
+    p: Produto = None
+
+    for produto in produtos:
+        if produto.codigo == codigo:
+            p = produto
+    return p
+
+if __name__ == '__main__':
+    main()
 
 
 
